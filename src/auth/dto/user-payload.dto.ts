@@ -1,10 +1,12 @@
+import mongoose from 'mongoose';
+
 /**
- * UserPayload
+ * UserPayloadDto
  * data entity for request user payload object
  */
-export class UserPayload {
-  'id': string;
-  '_id': string;
+export class UserPayloadDto {
+  'id': mongoose.Types.ObjectId;
+  '_id': mongoose.Types.ObjectId;
   'username': string;
   'type': number;
 }

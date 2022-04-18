@@ -18,4 +18,6 @@ export class User extends Document {
   type: UserType.USER | UserType.ADMIN;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+const UserSchema = SchemaFactory.createForClass(User);
+UserSchema.index({ username: 1 }, { unique: true });
+export { UserSchema };
