@@ -7,8 +7,11 @@ import { Dataset, DatasetSchema } from './entities/dataset';
 
 @Module({
   imports: [
+    MongooseModule.forFeature(
+      [{ name: Dataset.name, schema: DatasetSchema }],
+      'paperless-db',
+    ),
     CommonModule,
-    MongooseModule.forFeature([{ name: Dataset.name, schema: DatasetSchema }]),
   ],
   controllers: [DatasetsController],
   providers: [DatasetsService],

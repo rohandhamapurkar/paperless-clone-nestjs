@@ -27,7 +27,7 @@ export class DatasetsController {
       limits: {
         fileSize: 20 * 1024 * 1024,
       },
-      fileFilter: (req, file, callback) => {
+      fileFilter: (_, file, callback) => {
         const ext = file.originalname ? file.originalname.split('.')[1] : '';
         if (!FILE_UPLOAD_ALLOWED_EXTENSIONS.includes(ext)) {
           callback(new Error('Invalid file extension'), false);
@@ -41,26 +41,29 @@ export class DatasetsController {
     @Body() body: UploadReqBodyDto,
     @User() user: UserPayloadDto,
   ) {
-    // const top = new RowsDto();
-    // top.rows = [{ name: 'test' }, { name: 'test' }, { name: 'test' }];
-    // if (!datasetFile) {
-    //   throw new NotFoundException("Form data doesn't contain any file.");
-    // }
-    // const dataset = await this.datasetService.create(body.name, user._id);
+    if (!datasetFile) {
+      throw new NotFoundException("Form data doesn't contain any file.");
+    }
+    const dataset = await this.datasetService.create(body.name, user._id);
+
+    await this.datasetService.insertFromXlsx({
+      file: datasetFile.buffer,
+      datasetId: dataset._id,
+    });
   }
 
-  //   @Get()
-  //   getDatasets() {
+  @Get()
+  getDatasets() {
+    return {};
+  }
 
-  //   }
+  @Get(':id')
+  getDataset() {
+    return {};
+  }
 
-  //   @Get(':id')
-  //   getDataset() {
-
-  //   }
-
-  //   @Delete(':id')
-  //   deleteDataset() {
-
-  //   }
+  @Delete(':id')
+  deleteDataset() {
+    return {};
+  }
 }
