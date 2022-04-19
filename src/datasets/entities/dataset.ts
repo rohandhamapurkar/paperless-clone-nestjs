@@ -4,13 +4,13 @@ import { User } from 'src/users/entities/user.entity';
 
 @Schema()
 export class Dataset {
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
   userId: User;
 
-  @Prop()
+  @Prop({ required: true })
   name: string;
 
-  @Prop()
+  @Prop({ required: true })
   createdOn: Date;
 }
 

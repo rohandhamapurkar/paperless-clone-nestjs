@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   NotFoundException,
+  Param,
   Post,
   UploadedFile,
   UseGuards,
@@ -36,7 +37,7 @@ export class DatasetsController {
       },
     }),
   )
-  async postDataset(
+  async createDataset(
     @UploadedFile() datasetFile: Express.Multer.File,
     @Body() body: UploadReqBodyDto,
     @User() user: UserPayloadDto,
@@ -44,26 +45,37 @@ export class DatasetsController {
     if (!datasetFile) {
       throw new NotFoundException("Form data doesn't contain any file.");
     }
-    const dataset = await this.datasetService.create(body.name, user._id);
 
-    await this.datasetService.insertFromXlsx({
+    await this.datasetService.create({
       file: datasetFile.buffer,
-      datasetId: dataset._id,
+      datasetName: body.name,
+      userId: user._id,
     });
+
+    return 'Dataset created successfully';
   }
 
   @Get()
-  getDatasets() {
-    return {};
+  async getDatasets(@User() user: UserPayloadDto) {
+    return await this.datasetService.findAll(user._id);
   }
 
   @Get(':id')
-  getDataset() {
-    return {};
+  async getDataset(@User() user: UserPayloadDto, @Param('id') id: string) {
+    const dataset = await this.datasetService.findOne({
+      userId: user._id,
+      datasetId: id,
+    });
+    if (!dataset) throw new NotFoundException('Dataset not found');
+    return dataset;
   }
 
   @Delete(':id')
-  deleteDataset() {
-    return {};
+  async deleteDataset(@User() user: UserPayloadDto, @Param('id') id: string) {
+    await this.datasetService.remove({
+      userId: user._id,
+      datasetId: id,
+    });
+    return 'Deleted dataset successfully';
   }
 }

@@ -21,7 +21,7 @@ export class AuthService {
 
   async login(user: UserPayloadDto) {
     return {
-      accessToken: this.jwtService.sign(user, { expiresIn: '1h' }),
+      accessToken: this.jwtService.sign(user),
     };
   }
 }

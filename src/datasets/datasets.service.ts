@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
@@ -20,66 +21,124 @@ export class DatasetsService {
     private readonly connection: mongoose.Connection,
   ) {}
 
-  async create(name: string, userId: mongoose.Types.ObjectId) {
-    try {
-      const dataset = await this.datasetRepository.create({
-        name,
-        userId,
-        createdOn: new Date(),
-      });
-      return await dataset.save();
-    } catch (e) {
-      if (e.code == 11000) {
-        throw new BadRequestException('Duplicate dataset name found');
-      } else {
-        throw new ServiceUnavailableException(
-          'Something wrong with the database please try again.',
-        );
-      }
-    }
+  findAll(userId: mongoose.Types.ObjectId) {
+    return this.datasetRepository.find({ userId });
   }
 
-  insertFromXlsx({
-    file,
+  findOne({
+    userId,
     datasetId,
   }: {
+    userId: mongoose.Types.ObjectId;
+    datasetId: string;
+  }) {
+    return this.datasetRepository.findOne({
+      userId,
+      _id: new mongoose.Types.ObjectId(datasetId),
+    });
+  }
+
+  create({
+    file,
+    datasetName,
+    userId,
+  }: {
     file: Buffer;
-    datasetId: mongoose.Types.ObjectId;
+    datasetName: string;
+    userId: mongoose.Types.ObjectId;
   }): Promise<null> {
     return new Promise(async (resolve, reject) => {
-      // create a tempCollection Name
-      const tempCollectionName = String(datasetId); //`temp_${uuidv4()}`;
-      const jsonStream = this.commonService.xlsxToJson(file);
-      const promiseArr: Promise<void>[] = [];
+      let session: mongoose.ClientSession;
+      try {
+        session = await this.connection.startSession();
+        const jsonStream = this.commonService.xlsxToJson(file);
+        const promiseArr: Promise<void>[] = [];
 
-      const session = await this.connection.startSession();
-      await session.startTransaction();
-      jsonStream.on('error', async (e) => {
-        console.error(e);
-        reject(new ServiceUnavailableException('Error while reading file'));
-        await session.abortTransaction();
-        jsonStream.destroy();
-      });
+        await session.startTransaction();
 
-      // stream on each data row recieved try building the finalObj and insert into the tempCollection
-      jsonStream.on('data', async (obj) => {
-        return promiseArr.push(
-          this.buildDatasetRow({ obj, session, tempCollectionName }),
+        const dataset = await this.datasetRepository.create(
+          [
+            {
+              name: datasetName,
+              userId,
+              createdOn: new Date(),
+            },
+          ],
+          { session },
         );
-      });
+        const result = await dataset[0].save({ session });
+        const collectionName = String(result._id);
 
-      jsonStream.on('end', async () => {
-        try {
-          await Promise.all(promiseArr);
-        } catch (e) {
-          reject(e);
+        jsonStream.on('error', async (e) => {
+          console.error(e);
+          reject(new ServiceUnavailableException('Error while reading file'));
+          await session.abortTransaction();
+          await session.endSession();
           jsonStream.destroy();
-          return await session.abortTransaction();
+        });
+
+        // stream on each data row recieved try building the finalObj and insert into the tempCollection
+        jsonStream.on('data', async (obj) => {
+          return promiseArr.push(
+            this.buildDatasetRow({ obj, session, collectionName }),
+          );
+        });
+
+        jsonStream.on('end', async () => {
+          try {
+            await Promise.all(promiseArr);
+          } catch (e) {
+            reject(e);
+            jsonStream.destroy();
+            await session.abortTransaction();
+            return await session.endSession();
+          }
+          await session.commitTransaction();
+          await session.endSession();
+          resolve(null);
+        });
+      } catch (e) {
+        if (e.code === 11000) {
+          reject(new BadRequestException('Duplicate dataset name found'));
+        } else {
+          reject(e);
         }
-        await session.commitTransaction();
-        resolve(null);
-      });
+        await session.abortTransaction();
+        await session.endSession();
+      }
     });
+  }
+
+  async remove({
+    userId,
+    datasetId,
+  }: {
+    userId: mongoose.Types.ObjectId;
+    datasetId: string;
+  }) {
+    const session = await this.connection.startSession();
+    try {
+      await session.startTransaction();
+      const dataset = await this.datasetRepository.findOneAndDelete(
+        {
+          userId,
+          _id: new mongoose.Types.ObjectId(datasetId),
+        },
+        { session },
+      );
+
+      if (!dataset) throw new NotFoundException('Dataset not found');
+      await this.connection
+        .collection(String(dataset._id))
+        .deleteMany({}, { session });
+
+      await session.commitTransaction();
+    } catch (e) {
+      await session.abortTransaction();
+      throw e;
+    } finally {
+      await session.endSession();
+    }
   }
 
   /**
@@ -89,19 +148,20 @@ export class DatasetsService {
   async buildDatasetRow({
     obj,
     session,
-    tempCollectionName,
+    collectionName,
   }: {
     obj: any;
     session: mongoose.ClientSession;
-    tempCollectionName: string;
+    collectionName: string;
   }) {
     const opts = { session };
     const dto = new ExcelRowDto();
     dto.name = obj.name;
     const errors = await validate(dto);
-    if (errors.length != 0) throw new BadRequestException('Invalid data');
+    if (errors.length != 0)
+      throw new BadRequestException(`Invalid data row, ${JSON.stringify(obj)}`);
     const insertionResult = await this.connection
-      .collection(tempCollectionName)
+      .collection(collectionName)
       .insertOne(dto, opts);
     if (!insertionResult.acknowledged) {
       throw new ServiceUnavailableException('Database insertion failed');
