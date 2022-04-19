@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { DatasetsModule } from './datasets/datasets.module';
 import { CommonModule } from './common/common.module';
+import { TemplatesModule } from './templates/templates.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { CommonModule } from './common/common.module';
     AuthModule,
     UsersModule,
     DatasetsModule,
+    TemplatesModule,
   ],
   controllers: [],
   providers: [],

@@ -16,6 +16,7 @@ import { UserPayloadDto } from 'src/auth/dto/user-payload.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { FILE_UPLOAD_ALLOWED_EXTENSIONS } from './constants';
 import { DatasetsService } from './datasets.service';
+import { DatasetParamDto } from './dto/dataset-param.dto';
 import { UploadReqBodyDto } from './dto/upload-req.dto';
 
 @UseGuards(JwtAuthGuard)
@@ -61,20 +62,26 @@ export class DatasetsController {
   }
 
   @Get(':id')
-  async getDataset(@User() user: UserPayloadDto, @Param('id') id: string) {
+  async getDataset(
+    @User() user: UserPayloadDto,
+    @Param() params: DatasetParamDto,
+  ) {
     const dataset = await this.datasetService.findOne({
       userId: user._id,
-      datasetId: id,
+      datasetId: params.id,
     });
     if (!dataset) throw new NotFoundException('Dataset not found');
     return dataset;
   }
 
   @Delete(':id')
-  async deleteDataset(@User() user: UserPayloadDto, @Param('id') id: string) {
+  async deleteDataset(
+    @User() user: UserPayloadDto,
+    @Param() params: DatasetParamDto,
+  ) {
     await this.datasetService.remove({
       userId: user._id,
-      datasetId: id,
+      datasetId: params.id,
     });
     return 'Deleted dataset successfully';
   }

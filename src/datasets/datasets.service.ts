@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
@@ -11,6 +12,7 @@ import { CommonService } from 'src/common/common.service';
 import { ExcelRowDto } from './dto/excel-row.dto';
 import { validate } from 'class-validator';
 
+const logger = new Logger('Dataset');
 @Injectable()
 export class DatasetsService {
   constructor(
@@ -70,7 +72,7 @@ export class DatasetsService {
         const collectionName = String(result._id);
 
         jsonStream.on('error', async (e) => {
-          console.error(e);
+          logger.error(e);
           reject(new ServiceUnavailableException('Error while reading file'));
           await session.abortTransaction();
           await session.endSession();
