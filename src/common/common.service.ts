@@ -1,10 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Readable } from 'stream';
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+import { Readable, Stream } from 'stream';
 import * as xlsx from 'xlsx';
 import FormData from 'form-data';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
-import { lastValueFrom, map } from 'rxjs';
+import { catchError, firstValueFrom, map } from 'rxjs';
 
 @Injectable()
 export class CommonService {
@@ -28,27 +32,42 @@ export class CommonService {
     fileStream,
   }: {
     filename: string;
-    fileStream: any;
-  }) {
+    fileStream: Buffer | Stream;
+  }): Promise<string> {
     const data = new FormData();
-    data.append('image', fileStream);
-    data.append('name', filename);
+    data.append('image', fileStream, { filename: filename });
 
-    const response = await this.httpService
-      .post('https://api.imgur.com/3/upload', data, {
+    const response = this.httpService.post(
+      'https://api.imgur.com/3/upload',
+      data,
+      {
         headers: {
+          'Content-Length': data.getLengthSync(),
           Authorization:
             'Client-ID ' + this.configService.get<string>('IMGUR_CLIENT_ID'),
           ...data.getHeaders(),
         },
-      })
-      .pipe(map((response) => response.data));
+      },
+    );
 
-    console.log(response);
+    const result = await firstValueFrom(
+      response.pipe(
+        catchError((e) => {
+          Logger.error(e.response.data);
+          throw new ServiceUnavailableException(
+            'Could not upload image to Imgur',
+          );
+        }),
+        map((response) => {
+          return response.data;
+        }),
+      ),
+    );
 
-    return {
-      ok: true,
-      publicLink: '',
-    };
+    if (result.status == 200 && result.data.link != '') {
+      return result.data.link;
+    } else {
+      throw new ServiceUnavailableException('Could not upload image to Imgur');
+    }
   }
 }

@@ -15,5 +15,5 @@ export class Dataset {
 }
 
 const DatasetSchema = SchemaFactory.createForClass(Dataset);
-DatasetSchema.index({ name: 1 }, { unique: true });
+DatasetSchema.index({ name: 1, userId: 1 }, { unique: true });
 export { DatasetSchema };

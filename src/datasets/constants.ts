@@ -1,1 +1,2 @@
-export const FILE_UPLOAD_ALLOWED_EXTENSIONS = ['xlsx', 'xls'];
+export const DATASET_FILE_UPLOAD_ALLOWED_EXTENSIONS = ['xlsx', 'xls'];
+export const DATASET_FILE_UPLOAD_SIZE_LIMIT = 10 * 1024 * 1024;
