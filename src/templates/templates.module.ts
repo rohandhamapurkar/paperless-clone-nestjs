@@ -3,7 +3,7 @@ import { TemplatesService } from './templates.service';
 import { TemplatesController } from './templates.controller';
 import { CommonModule } from 'src/common/common.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Template, TemplateSchema } from './entities/template';
+import { Template, TemplateSchema } from './entities/template.entity';
 
 @Module({
   imports: [

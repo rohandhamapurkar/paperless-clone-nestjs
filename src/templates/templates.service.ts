@@ -7,7 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { CommonService } from 'src/common/common.service';
-import { Template } from './entities/template';
+import { Template } from './entities/template.entity';
 
 @Injectable()
 export class TemplatesService {

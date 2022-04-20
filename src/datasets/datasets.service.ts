@@ -6,7 +6,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Dataset } from './entities/dataset';
+import { Dataset } from './entities/dataset.entity';
 import mongoose from 'mongoose';
 import { CommonService } from 'src/common/common.service';
 import { ExcelRowDto } from './dto/excel-row.dto';

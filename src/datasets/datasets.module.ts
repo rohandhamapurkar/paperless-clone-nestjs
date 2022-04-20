@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { CommonModule } from 'src/common/common.module';
 import { DatasetsController } from './datasets.controller';
 import { DatasetsService } from './datasets.service';
-import { Dataset, DatasetSchema } from './entities/dataset';
+import { Dataset, DatasetSchema } from './entities/dataset.entity';
 
 @Module({
   imports: [
