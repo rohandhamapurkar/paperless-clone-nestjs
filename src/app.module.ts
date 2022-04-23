@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { DatasetsModule } from './datasets/datasets.module';
 import { CommonModule } from './common/common.module';
 import { TemplatesModule } from './templates/templates.module';
+import { JobsModule } from './jobs/jobs.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { TemplatesModule } from './templates/templates.module';
     UsersModule,
     DatasetsModule,
     TemplatesModule,
+    JobsModule,
   ],
   controllers: [],
   providers: [],
