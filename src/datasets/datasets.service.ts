@@ -11,8 +11,7 @@ import mongoose from 'mongoose';
 import { CommonService } from 'src/common/common.service';
 import { ExcelRowDto } from './dto/excel-row.dto';
 import { validate } from 'class-validator';
-
-const logger = new Logger('Dataset');
+const logger = new Logger('DatasetsService');
 @Injectable()
 export class DatasetsService {
   constructor(
@@ -158,13 +157,13 @@ export class DatasetsService {
   }) {
     const opts = { session };
     const dto = new ExcelRowDto();
-    dto.name = obj.name;
+    dto.obj = obj;
     const errors = await validate(dto);
     if (errors.length != 0)
       throw new BadRequestException(`Invalid data row, ${JSON.stringify(obj)}`);
     const insertionResult = await this.connection
       .collection(collectionName)
-      .insertOne(dto, opts);
+      .insertOne({ ...dto.obj }, opts);
     if (!insertionResult.acknowledged) {
       throw new ServiceUnavailableException('Database insertion failed');
     }

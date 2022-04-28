@@ -9,7 +9,7 @@ import FormData from 'form-data';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom, map } from 'rxjs';
-
+const logger = new Logger('CommonService');
 @Injectable()
 export class CommonService {
   constructor(
@@ -53,7 +53,7 @@ export class CommonService {
     const result = await firstValueFrom(
       response.pipe(
         catchError((e) => {
-          Logger.error(e.response.data);
+          logger.error(e.response.data);
           throw new ServiceUnavailableException(
             'Could not upload image to Imgur',
           );

@@ -1,7 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
-
+type Row = Record<string, string | number>;
 export class ExcelRowDto {
-  @IsNotEmpty()
-  @IsString()
-  name: string;
+  obj: Row;
 }
