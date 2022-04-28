@@ -1,12 +1,22 @@
-import { Controller, Inject, Post, UseGuards, Logger } from '@nestjs/common';
+import {
+  Controller,
+  Inject,
+  Post,
+  UseGuards,
+  Logger,
+  Get,
+  Query,
+  Param,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { User } from 'src/auth/decorators/user.decorator';
 import { UserPayloadDto } from 'src/auth/dto/user-payload.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { v4 } from 'uuid';
 import { JOB_SERVICE_MESSAGE_PATTERNS } from './constants';
+import { GetJobsChangelogDto } from './dto/get-job-changelog.dto';
+import { GetJobsDto } from './dto/get-jobs.dto';
 const logger = new Logger('JobsController');
-
 @UseGuards(JwtAuthGuard)
 @Controller('jobs')
 export class JobsController {
@@ -14,8 +24,8 @@ export class JobsController {
     @Inject('JOB_SERVICE_TCP') private tcpClient: ClientProxy,
     @Inject('JOB_SERVICE_RMQ') private rmqClient: ClientProxy,
   ) {}
-  @Post('test-rmq')
-  sendRmqTestEvent(@User() user: UserPayloadDto) {
+  @Post()
+  submitJobToQueue(@User() user: UserPayloadDto) {
     this.rmqClient
       .send(JOB_SERVICE_MESSAGE_PATTERNS.CREATE_JOB, {
         userId: user._id,
@@ -72,14 +82,22 @@ export class JobsController {
       });
   }
 
-  @Post('test-tcp')
-  sendTcpTestEvent() {
-    this.tcpClient
-      .send(JOB_SERVICE_MESSAGE_PATTERNS.GET_JOB, [1, 2, 3, 4])
-      .subscribe({
-        next: (v) => logger.log(v),
-        error: (e) => logger.error(e),
-        complete: () => logger.log('complete'),
-      });
+  @Get()
+  getJobs(@Query() query: GetJobsDto, @User() user: UserPayloadDto) {
+    return this.tcpClient.send(JOB_SERVICE_MESSAGE_PATTERNS.GET_JOBS, {
+      ...query,
+      userId: user._id,
+    });
+  }
+
+  @Get('job-changelog/:id')
+  getJobChangelog(
+    @Param() param: GetJobsChangelogDto,
+    @User() user: UserPayloadDto,
+  ) {
+    return this.tcpClient.send(JOB_SERVICE_MESSAGE_PATTERNS.GET_JOB_CHANGELOG, {
+      jobId: param.id,
+      userId: user._id,
+    });
   }
 }
