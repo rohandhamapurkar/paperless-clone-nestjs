@@ -3,7 +3,6 @@ import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OAuth2Client } from 'google-auth-library';
 import { Stream } from 'stream';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class GoogleService {
@@ -80,7 +79,7 @@ export class GoogleService {
       ...(folderId && {
         parents: [folderId],
       }),
-      name: uuidv4() + '_' + filename,
+      name: filename,
     };
     const media = {
       mimeType: mimeType,
