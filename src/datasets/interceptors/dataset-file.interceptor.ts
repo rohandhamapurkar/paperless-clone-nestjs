@@ -5,6 +5,9 @@ import {
   DATASET_FILE_UPLOAD_ALLOWED_EXTENSIONS,
 } from '../constants';
 
+/**
+ * NestJS interceptor for form file upload validation
+ */
 export const DatasetFileInterceptor = FileInterceptor('file', {
   limits: {
     fileSize: DATASET_FILE_UPLOAD_SIZE_LIMIT,

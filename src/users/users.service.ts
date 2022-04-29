@@ -7,13 +7,20 @@ import { User, UserType } from './entities/user.entity';
 @Injectable()
 export class UsersService {
   constructor(
+    // inject user model for operations with users collection
     @InjectModel(User.name) private readonly usersRespository: Model<User>,
   ) {}
 
+  /**
+   * Fetches single user from the database on username
+   */
   async findOne(username: string) {
     return this.usersRespository.findOne({ username }).exec();
   }
 
+  /**
+   * Inserts a user doc in the users collection
+   */
   async create(
     user: { username: string; password: string },
     session?: mongoose.ClientSession,

@@ -6,6 +6,9 @@ import {
   MinLength,
 } from 'class-validator';
 
+/**
+ * RegisterUserDto is for validating register endpoint request body
+ */
 export class RegisterUserDto {
   @IsEmail()
   username: string;

@@ -6,6 +6,10 @@ export enum UserType {
   ADMIN = 10,
 }
 
+/**
+ * User Schema is used for defining mongodb collection
+ * for storing user documents
+ */
 @Schema()
 export class User extends Document {
   @Prop({ required: true })

@@ -1,8 +1,7 @@
 import mongoose from 'mongoose';
 
 /**
- * UserPayloadDto
- * data entity for request user payload object
+ * UserPayloadDto is data entity for user object on request instance
  */
 export class UserPayloadDto {
   'id': mongoose.Types.ObjectId;

@@ -15,30 +15,48 @@ const logger = new Logger('DatasetsService');
 @Injectable()
 export class DatasetsService {
   constructor(
+    // inject dataset model for operations with dataset collection
     @InjectModel(Dataset.name)
     private readonly datasetRepository: mongoose.Model<Dataset>,
+    // common service dependency
     private readonly commonService: CommonService,
+    // inject dataset database connection for dataset rows collection
     @InjectConnection('datasets-db')
     private readonly connection: mongoose.Connection,
   ) {}
 
+  /**
+   * To get all datasets uploaded by a user
+   */
   findAll(userId: mongoose.Types.ObjectId) {
     return this.datasetRepository.find({ userId });
   }
 
-  findOne({
+  /**
+   * Get limited dataset rows for a dataset uploaded for a user
+   */
+  async getDatasetRows({
     userId,
     datasetId,
   }: {
     userId: mongoose.Types.ObjectId;
     datasetId: string;
   }) {
-    return this.datasetRepository.findOne({
+    const dataset = await this.datasetRepository.findOne({
       userId,
       _id: new mongoose.Types.ObjectId(datasetId),
     });
+    if (!dataset) throw new NotFoundException('Dataset not found');
+
+    return this.connection
+      .collection(String(dataset._id))
+      .find({}, { limit: 20 })
+      .toArray();
   }
 
+  /**
+   * Uploads the xlsx file and insert dataset and dataset rows in the database
+   */
   create({
     file,
     datasetName,
@@ -110,6 +128,9 @@ export class DatasetsService {
     });
   }
 
+  /**
+   * Removes the dataset entry and all dataset rows for a user uploaded dataset
+   */
   async remove({
     userId,
     datasetId,
@@ -143,8 +164,7 @@ export class DatasetsService {
   }
 
   /**
-   * buildDatasetRow
-   * used to build the final object which will be inserted in the temporary collection
+   * Used to build the final object which will be inserted in the collection which contains the dataset rows
    */
   async buildDatasetRow({
     obj,

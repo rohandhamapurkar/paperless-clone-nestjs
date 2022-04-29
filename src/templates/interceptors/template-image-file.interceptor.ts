@@ -5,6 +5,9 @@ import {
   TEMPLATE_IMAGE_UPLOAD_SIZE_LIMIT,
 } from '../constants';
 
+/**
+ * NestJS interceptor for form image file upload validation
+ */
 export const TemplateImageFileInterceptor = FileInterceptor('file', {
   limits: {
     fileSize: TEMPLATE_IMAGE_UPLOAD_SIZE_LIMIT,

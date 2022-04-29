@@ -1,10 +1,13 @@
 import { registerDecorator } from 'class-validator';
 import mongoose from 'mongoose';
 
-export function isObjectId() {
+/**
+ * Custom decorator to check if string is hex or objectid
+ */
+export function IsObjectId() {
   return function (object: object, propertyName: string) {
     registerDecorator({
-      name: 'isObjectId',
+      name: 'IsObjectId',
       target: object.constructor,
       propertyName: propertyName,
       options: {

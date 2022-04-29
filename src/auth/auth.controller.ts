@@ -11,23 +11,35 @@ import { VerifyOtpDto } from './dto/verify-otp.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  /**
+   * Endpoint for user authentication
+   */
   @UseGuards(LocalAuthGuard)
   @Post('/login')
-  async login(@User() user: UserPayloadDto) {
+  async login(@User() user: UserPayloadDto): Promise<{ accessToken: string }> {
     return this.authService.login(user);
   }
 
+  /**
+   * Endpoint for user registeration
+   */
   @Post('/register')
   async register(@Body() body: RegisterUserDto) {
     await this.authService.register(body);
     return 'Sent otp email successfully';
   }
 
+  /**
+   * Endpoint for user otp verification
+   */
   @Post('/verify-otp')
   async verifyEmailOtp(@Body() body: VerifyOtpDto) {
     return await this.authService.verifyOtp(body);
   }
 
+  /**
+   * Endpoint for getting user information
+   */
   @UseGuards(JwtAuthGuard)
   @Get('/me')
   async getUserData(@User() user: UserPayloadDto) {

@@ -5,6 +5,10 @@ import { UserPayloadDto } from '../../auth/dto/user-payload.dto';
 import { ConfigService } from '@nestjs/config';
 import mongoose from 'mongoose';
 
+/**
+ * JwtStrategy extends the passport strategy to create a
+ * jwt authorization strategy
+ */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(readonly configService: ConfigService) {

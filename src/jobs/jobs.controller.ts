@@ -21,9 +21,15 @@ const logger = new Logger('JobsController');
 @Controller('jobs')
 export class JobsController {
   constructor(
+    // Tcp client instance for communication with job microservice
     @Inject('JOB_SERVICE_TCP') private tcpClient: ClientProxy,
+    // RabbitMQ client instance for communication with job microservice
     @Inject('JOB_SERVICE_RMQ') private rmqClient: ClientProxy,
   ) {}
+
+  /**
+   * Submits the job definition from UI to job microservice
+   */
   @Post()
   submitJobToQueue(@User() user: UserPayloadDto) {
     this.rmqClient
@@ -82,6 +88,9 @@ export class JobsController {
       });
   }
 
+  /**
+   * Gets the list of user initiated jobs from the job microservice
+   */
   @Get()
   getJobs(@Query() query: GetJobsDto, @User() user: UserPayloadDto) {
     return this.tcpClient.send(JOB_SERVICE_MESSAGE_PATTERNS.GET_JOBS, {
@@ -90,6 +99,9 @@ export class JobsController {
     });
   }
 
+  /**
+   * Gets the job changelog for a given job
+   */
   @Get('job-changelog/:id')
   getJobChangelog(
     @Param() param: GetJobsChangelogDto,

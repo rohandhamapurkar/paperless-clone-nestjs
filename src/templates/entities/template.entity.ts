@@ -2,6 +2,10 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { User } from 'src/users/entities/user.entity';
 
+/**
+ * Template Schema is used for defining mongodb collection
+ * for storing template documents
+ */
 @Schema()
 export class Template {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })

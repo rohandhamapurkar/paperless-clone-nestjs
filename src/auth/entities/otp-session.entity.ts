@@ -1,5 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
+/**
+ * OtpSession Schema is used for defining mongodb collection
+ * for storing otp session documents
+ */
 @Schema()
 export class OtpSession {
   @Prop({ required: true })

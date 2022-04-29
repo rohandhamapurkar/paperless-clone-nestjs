@@ -12,15 +12,22 @@ import { Template } from './entities/template.entity';
 @Injectable()
 export class TemplatesService {
   constructor(
+    // inject template model for operations with template collection
     @InjectModel(Template.name)
     private readonly templateRepository: mongoose.Model<Template>,
     private readonly commonService: CommonService,
   ) {}
 
+  /**
+   * To get all templates for a user from the database
+   */
   findAll(userId: mongoose.Types.ObjectId) {
     return this.templateRepository.find({ userId });
   }
 
+  /**
+   * To get single template for a user from the database
+   */
   findOne({
     userId,
     templateId,
@@ -34,6 +41,9 @@ export class TemplatesService {
     });
   }
 
+  /**
+   * To upload image to imgur and create a template
+   */
   async create({
     file,
     filename,
@@ -69,6 +79,9 @@ export class TemplatesService {
     }
   }
 
+  /**
+   * Updates the user template
+   */
   async update({
     updateObj,
     templateId,
@@ -109,6 +122,9 @@ export class TemplatesService {
     }
   }
 
+  /**
+   * Deletes the user template from database
+   */
   async remove({
     userId,
     templateId,

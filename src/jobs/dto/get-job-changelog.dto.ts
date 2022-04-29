@@ -1,8 +1,11 @@
 import { IsString, IsDefined } from 'class-validator';
-import { isObjectId } from 'src/common/decorators/isobjectid.decorator';
+import { IsObjectId } from 'src/common/decorators/isobjectid.decorator';
 
+/**
+ * job changelog endpoint query param validation
+ */
 export class GetJobsChangelogDto {
-  @isObjectId()
+  @IsObjectId()
   @IsString()
   @IsDefined()
   id: string;

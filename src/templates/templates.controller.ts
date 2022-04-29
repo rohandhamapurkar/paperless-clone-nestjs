@@ -24,6 +24,10 @@ import { TemplateParamsDto } from './dto/template-params.dto';
 @Controller('templates')
 export class TemplatesController {
   constructor(private readonly templateService: TemplatesService) {}
+
+  /**
+   * creates template by uploading form data with image and name
+   */
   @Post()
   @UseInterceptors(TemplateImageFileInterceptor)
   async createTemplate(
@@ -41,11 +45,17 @@ export class TemplatesController {
     return 'Template created successfully';
   }
 
+  /**
+   * gets templates uploaded by a user
+   */
   @Get()
   async getTemplates(@User() user: UserPayloadDto) {
     return await this.templateService.findAll(user._id);
   }
 
+  /**
+   * gets singular template uploaded by a user
+   */
   @Get(':id')
   async getTemplate(
     @User() user: UserPayloadDto,
@@ -59,6 +69,9 @@ export class TemplatesController {
     return dataset;
   }
 
+  /**
+   * updates the template uploaded for a user
+   */
   @Patch(':id')
   @UseInterceptors(TemplateImageFileInterceptor)
   async updateTemplate(
@@ -81,6 +94,9 @@ export class TemplatesController {
     return 'Updated template successfully';
   }
 
+  /**
+   * deletes the user uploaded template
+   */
   @Delete(':id')
   async deleteTemplate(
     @User() user: UserPayloadDto,

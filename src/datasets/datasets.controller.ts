@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Post,
   UploadedFile,
@@ -22,6 +21,10 @@ import { DatasetFileInterceptor } from './interceptors/dataset-file.interceptor'
 @Controller('datasets')
 export class DatasetsController {
   constructor(private readonly datasetService: DatasetsService) {}
+
+  /**
+   * Endpoint for dataset creation using file upload
+   */
   @Post()
   @UseInterceptors(DatasetFileInterceptor)
   async createDataset(
@@ -38,24 +41,32 @@ export class DatasetsController {
     return 'Dataset created successfully';
   }
 
+  /**
+   * Endpoint for getting all uploaded datasets for a user
+   */
   @Get()
   async getDatasets(@User() user: UserPayloadDto) {
     return await this.datasetService.findAll(user._id);
   }
 
+  /**
+   * Endpoint for getting dataset rows for a dataset
+   */
   @Get(':id')
   async getDataset(
     @User() user: UserPayloadDto,
     @Param() params: DatasetParamsDto,
   ) {
-    const dataset = await this.datasetService.findOne({
+    const dataset = await this.datasetService.getDatasetRows({
       userId: user._id,
       datasetId: params.id,
     });
-    if (!dataset) throw new NotFoundException('Dataset not found');
     return dataset;
   }
 
+  /**
+   * Endpoint deleting user uploaded dataset
+   */
   @Delete(':id')
   async deleteDataset(
     @User() user: UserPayloadDto,

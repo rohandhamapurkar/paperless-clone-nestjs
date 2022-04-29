@@ -15,17 +15,24 @@ export class GoogleService {
   readonly GDRIVE_OUTPUT_FOLDER_ID: string;
 
   constructor(private readonly configService: ConfigService) {
+    // get the google credentials
     const { client_secret, client_id, redirect_uris } = JSON.parse(
       this.configService.get<string>('GOOGLE_CREDENTIALS_JSON'),
     ).installed;
+
+    // get the google oauth instance
     this.oAuthClient = new google.auth.OAuth2(
       client_id,
       client_secret,
       redirect_uris[0],
     );
+
+    // load the google access token
     this.oAuthClient.setCredentials(
       JSON.parse(this.configService.get<string>('GOOGLE_TOKEN_JSON')),
     );
+
+    // get the google service instances
     this.gmailClient = google.gmail({ version: 'v1', auth: this.oAuthClient });
     this.gdriveClient = google.drive({ version: 'v3', auth: this.oAuthClient });
 
@@ -35,6 +42,9 @@ export class GoogleService {
     );
   }
 
+  /**
+   * For sending email using google api
+   */
   async sendEmail(emailBody: string) {
     const response = await this.gmailClient.users.messages.send({
       auth: this.oAuthClient,
@@ -52,6 +62,9 @@ export class GoogleService {
     }
   }
 
+  /**
+   * For uploading public sharable file using google drive api
+   */
   async uploadPublicFile({
     filename,
     folderId,

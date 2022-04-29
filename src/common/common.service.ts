@@ -13,9 +13,15 @@ const logger = new Logger('CommonService');
 @Injectable()
 export class CommonService {
   constructor(
+    // config service for environment variables
     private readonly configService: ConfigService,
+    // http service to make an api call
     private readonly httpService: HttpService,
   ) {}
+
+  /**
+   * Converts input xlsx file buffer to json data stream
+   */
   xlsxToJson(file: Buffer): Readable {
     const workbook = xlsx.read(file, { type: 'buffer' });
     const xlsxSheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -27,6 +33,9 @@ export class CommonService {
     return xlsxStream;
   }
 
+  /**
+   * Uploads the input file stream to Imgur
+   */
   async uploadImageToImgur({
     filename,
     fileStream,

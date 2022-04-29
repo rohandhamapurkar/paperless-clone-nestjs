@@ -24,10 +24,16 @@ export class AuthService {
     private readonly connection: mongoose.Connection,
   ) {}
 
+  /**
+   * To hash the string using bcrypt
+   */
   private async hashPassword(password: string): Promise<string> {
     return await bcrypt.hash(password, this.saltOrRounds);
   }
 
+  /**
+   * Validate the user in database with username and password
+   */
   async validateUser(username: string, password: string) {
     const user = await this.usersService.findOne(username);
     if (user && (await bcrypt.compare(password, user.password))) {
@@ -37,12 +43,18 @@ export class AuthService {
     return null;
   }
 
+  /**
+   * Returns the access token for the user
+   */
   async login(user: UserPayloadDto) {
     return {
       accessToken: this.jwtService.sign(user),
     };
   }
 
+  /**
+   * Generates otp and sends it to the user on email(username)
+   */
   async register(userCredentials: RegisterUserDto) {
     const otp = String(Math.floor(100000 + Math.random() * 900000));
 
@@ -92,6 +104,9 @@ export class AuthService {
     }
   }
 
+  /**
+   * Verifies the otp against the saved otp session entry in the database
+   */
   async verifyOtp(verifyPayload: VerifyOtpDto) {
     const session = await this.connection.startSession();
     try {
