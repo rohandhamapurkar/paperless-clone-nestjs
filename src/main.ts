@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -13,6 +13,11 @@ async function bootstrap() {
       transformOptions: { enableImplicitConversion: true },
     }),
   );
+  app.enableCors({
+    origin: ['http://localhost:8080', 'https://plc-api-server.herokuapp.com/'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  });
+  app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
   app.listen(configService.get<string>('PORT'));
   appContext.close();
 }
