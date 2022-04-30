@@ -9,9 +9,8 @@ import {
   Param,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { User } from 'src/auth/decorators/user.decorator';
-import { UserPayloadDto } from 'src/auth/dto/user-payload.dto';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { v4 } from 'uuid';
 import { JOB_SERVICE_MESSAGE_PATTERNS } from './constants';
 import { GetJobsChangelogDto } from './dto/get-job-changelog.dto';
@@ -31,10 +30,10 @@ export class JobsController {
    * Submits the job definition from UI to job microservice
    */
   @Post()
-  submitJobToQueue(@User() user: UserPayloadDto) {
+  submitJobToQueue() {
     this.rmqClient
       .send(JOB_SERVICE_MESSAGE_PATTERNS.CREATE_JOB, {
-        userId: user._id,
+        // userId: user._id,
         templateId: '626a3b9c9c4fe5978b3685c5',
         uuid: v4(),
         dataConfig: [
@@ -92,24 +91,21 @@ export class JobsController {
    * Gets the list of user initiated jobs from the job microservice
    */
   @Get()
-  getJobs(@Query() query: GetJobsDto, @User() user: UserPayloadDto) {
-    return this.tcpClient.send(JOB_SERVICE_MESSAGE_PATTERNS.GET_JOBS, {
-      ...query,
-      userId: user._id,
-    });
+  getJobs(@Query() query: GetJobsDto) {
+    // return this.tcpClient.send(JOB_SERVICE_MESSAGE_PATTERNS.GET_JOBS, {
+    //   ...query,
+    //   userId: user._id,
+    // });
   }
 
   /**
    * Gets the job changelog for a given job
    */
   @Get('job-changelog/:id')
-  getJobChangelog(
-    @Param() param: GetJobsChangelogDto,
-    @User() user: UserPayloadDto,
-  ) {
-    return this.tcpClient.send(JOB_SERVICE_MESSAGE_PATTERNS.GET_JOB_CHANGELOG, {
-      jobId: param.id,
-      userId: user._id,
-    });
+  getJobChangelog(@Param() param: GetJobsChangelogDto) {
+    // return this.tcpClient.send(JOB_SERVICE_MESSAGE_PATTERNS.GET_JOB_CHANGELOG, {
+    //   jobId: param.id,
+    //   userId: user._id,
+    // });
   }
 }

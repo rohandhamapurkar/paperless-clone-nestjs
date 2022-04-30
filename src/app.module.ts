@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
 import { DatasetsModule } from './datasets/datasets.module';
 import { CommonModule } from './common/common.module';
 import { TemplatesModule } from './templates/templates.module';
@@ -32,7 +31,6 @@ import { JobsModule } from './jobs/jobs.module';
 
     CommonModule,
     AuthModule,
-    UsersModule,
     DatasetsModule,
     TemplatesModule,
     JobsModule,
