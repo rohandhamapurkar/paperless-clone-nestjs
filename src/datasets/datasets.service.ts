@@ -28,7 +28,7 @@ export class DatasetsService {
   /**
    * To get all datasets uploaded by a user
    */
-  findAll(userId: mongoose.Types.ObjectId) {
+  findAll(userId: string) {
     return this.datasetRepository.find({ userId });
   }
 
@@ -39,7 +39,7 @@ export class DatasetsService {
     userId,
     datasetId,
   }: {
-    userId: mongoose.Types.ObjectId;
+    userId: string;
     datasetId: string;
   }) {
     const dataset = await this.datasetRepository.findOne({
@@ -64,7 +64,7 @@ export class DatasetsService {
   }: {
     file: Buffer;
     datasetName: string;
-    userId: mongoose.Types.ObjectId;
+    userId: string;
   }): Promise<null> {
     return new Promise(async (resolve, reject) => {
       let session: mongoose.ClientSession;
@@ -131,13 +131,7 @@ export class DatasetsService {
   /**
    * Removes the dataset entry and all dataset rows for a user uploaded dataset
    */
-  async remove({
-    userId,
-    datasetId,
-  }: {
-    userId: mongoose.Types.ObjectId;
-    datasetId: string;
-  }) {
+  async remove({ userId, datasetId }: { userId: string; datasetId: string }) {
     const session = await this.connection.startSession();
     try {
       await session.startTransaction();

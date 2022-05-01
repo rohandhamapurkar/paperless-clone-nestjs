@@ -21,20 +21,14 @@ export class TemplatesService {
   /**
    * To get all templates for a user from the database
    */
-  findAll(userId: mongoose.Types.ObjectId) {
+  findAll(userId: string) {
     return this.templateRepository.find({ userId });
   }
 
   /**
    * To get single template for a user from the database
    */
-  findOne({
-    userId,
-    templateId,
-  }: {
-    userId: mongoose.Types.ObjectId;
-    templateId: string;
-  }) {
+  findOne({ userId, templateId }: { userId: string; templateId: string }) {
     return this.templateRepository.findOne({
       userId,
       _id: new mongoose.Types.ObjectId(templateId),
@@ -53,7 +47,7 @@ export class TemplatesService {
     file: Buffer;
     filename: string;
     name: string;
-    userId: mongoose.Types.ObjectId;
+    userId: string;
   }) {
     const imageUrl = await this.commonService.uploadImageToImgur({
       filename: filename,
@@ -89,7 +83,7 @@ export class TemplatesService {
   }: {
     updateObj: any;
     templateId: string;
-    userId: mongoose.Types.ObjectId;
+    userId: string;
   }) {
     if (updateObj.hasOwnProperty('file')) {
       updateObj.imageUrl = await this.commonService.uploadImageToImgur({
@@ -125,13 +119,7 @@ export class TemplatesService {
   /**
    * Deletes the user template from database
    */
-  async remove({
-    userId,
-    templateId,
-  }: {
-    userId: mongoose.Types.ObjectId;
-    templateId: string;
-  }) {
+  async remove({ userId, templateId }: { userId: string; templateId: string }) {
     const template = await this.templateRepository.findOneAndDelete({
       userId,
       _id: new mongoose.Types.ObjectId(templateId),
