@@ -6,6 +6,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -15,6 +16,7 @@ import { RequestUser } from 'src/auth/decorators/request-user.decorator';
 import { UserTokenDto } from 'src/auth/dto/user-token-payload.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { DatasetsService } from './datasets.service';
 import { DatasetParamsDto } from './dto/dataset-params.dto';
 import { UploadReqBodyDto } from './dto/upload-req.dto';
@@ -50,15 +52,18 @@ export class DatasetsController {
    * Endpoint for getting all uploaded datasets for a user
    */
   @Get()
-  async getDatasets(@RequestUser() user: UserTokenDto) {
-    return await this.datasetService.findAll(user._id);
+  async getDatasets(
+    @RequestUser() user: UserTokenDto,
+    @Query() query: PaginationDto,
+  ) {
+    return await this.datasetService.findAll({ userId: user._id, query });
   }
 
   /**
    * Endpoint for getting dataset rows for a dataset
    */
   @Get(':id')
-  async getDataset(
+  async getDatasetRows(
     @Param() params: DatasetParamsDto,
     @RequestUser() user: UserTokenDto,
   ) {

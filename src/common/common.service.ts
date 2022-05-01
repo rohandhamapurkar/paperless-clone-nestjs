@@ -33,6 +33,10 @@ export class CommonService {
     return xlsxStream;
   }
 
+  createSearchRegex(text: string) {
+    return new RegExp(text.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'));
+  }
+
   /**
    * Uploads the input file stream to Imgur
    */

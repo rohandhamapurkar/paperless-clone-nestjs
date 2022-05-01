@@ -3,3 +3,9 @@ export enum JOB_SERVICE_MESSAGE_PATTERNS {
   GET_JOBS = 'GET_JOBS',
   GET_JOB_CHANGELOG = 'GET_JOB_CHANGELOG',
 }
+
+export enum DATA_CONFIG_TYPES {
+  STATIC_TEXT = 'staticText',
+  IMAGE = 'image',
+  FROM_DATASET = 'fromDataset',
+}

@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -22,6 +23,7 @@ import { TemplateParamsDto } from './dto/template-params.dto';
 import { UserTokenDto } from 'src/auth/dto/user-token-payload.dto';
 import { Permissions } from 'src/auth/decorators/permissions.decorator';
 import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
+import { PaginationDto } from '../common/dto/pagination.dto';
 
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('templates')
@@ -53,8 +55,11 @@ export class TemplatesController {
    * gets templates uploaded by a user
    */
   @Get()
-  async getTemplates(@RequestUser() user: UserTokenDto) {
-    return await this.templateService.findAll(user._id);
+  async getTemplates(
+    @RequestUser() user: UserTokenDto,
+    @Query() query: PaginationDto,
+  ) {
+    return await this.templateService.findAll({ userId: user._id, query });
   }
 
   /**

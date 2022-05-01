@@ -11,6 +11,7 @@ import mongoose from 'mongoose';
 import { CommonService } from 'src/common/common.service';
 import { ExcelRowDto } from './dto/excel-row.dto';
 import { validate } from 'class-validator';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 const logger = new Logger('DatasetsService');
 @Injectable()
 export class DatasetsService {
@@ -28,8 +29,23 @@ export class DatasetsService {
   /**
    * To get all datasets uploaded by a user
    */
-  findAll(userId: string) {
-    return this.datasetRepository.find({ userId });
+  async findAll({ userId, query }: { userId: string; query: PaginationDto }) {
+    const filter = {
+      userId,
+      ...(query.searchText !== '' && {
+        name: this.commonService.createSearchRegex(query.searchText),
+      }),
+    };
+    const data = await this.datasetRepository.find(
+      filter,
+      {},
+      { skip: +query.pageNo * +query.pageSize, limit: +query.pageSize },
+    );
+    return {
+      data,
+      fetchCount: await this.datasetRepository.countDocuments(filter),
+      totalCount: await this.datasetRepository.countDocuments(),
+    };
   }
 
   /**

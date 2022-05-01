@@ -7,6 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { CommonService } from 'src/common/common.service';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { Template } from './entities/template.entity';
 
 @Injectable()
@@ -21,8 +22,24 @@ export class TemplatesService {
   /**
    * To get all templates for a user from the database
    */
-  findAll(userId: string) {
-    return this.templateRepository.find({ userId });
+  async findAll({ userId, query }: { userId: string; query: PaginationDto }) {
+    const filter = {
+      userId,
+      ...(query.searchText !== '' && {
+        name: this.commonService.createSearchRegex(query.searchText),
+      }),
+    };
+    const data = await this.templateRepository.find(
+      filter,
+      {},
+      { skip: +query.pageNo * +query.pageSize, limit: +query.pageSize },
+    );
+
+    return {
+      data,
+      fetchCount: await this.templateRepository.countDocuments(filter),
+      totalCount: await this.templateRepository.countDocuments(),
+    };
   }
 
   /**
