@@ -14,6 +14,9 @@ export class Dataset {
 
   @Prop({ required: true })
   createdOn: Date;
+
+  @Prop({ required: true })
+  headers: string[];
 }
 
 const DatasetSchema = SchemaFactory.createForClass(Dataset);

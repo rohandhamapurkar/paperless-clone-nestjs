@@ -92,10 +92,11 @@ export class TemplatesController {
     await this.templateService.update({
       updateObj: {
         ...(body.name && { name: body.name }),
-        ...(templateFile && {
-          file: templateFile.buffer,
-          filename: templateFile.originalname,
-        }),
+        ...(templateFile &&
+          templateFile.size !== 0 && {
+            file: templateFile.buffer,
+            filename: templateFile.originalname,
+          }),
       },
       templateId: params.id,
       userId: user._id,

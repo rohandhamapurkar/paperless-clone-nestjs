@@ -8,6 +8,7 @@ import {
   Query,
   Param,
   Body,
+  Logger,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Permissions } from 'src/auth/decorators/permissions.decorator';
@@ -21,7 +22,7 @@ import { v4 } from 'uuid';
 import { JOB_SERVICE_MESSAGE_PATTERNS } from './constants';
 import { GetJobsChangelogDto } from './dto/get-job-changelog.dto';
 import { SubmitJobDto } from './dto/submit-job.dto';
-// const logger = new Logger('JobsController');
+const logger = new Logger('JobsController');
 
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('jobs')
@@ -42,11 +43,24 @@ export class JobsController {
     @Body() body: SubmitJobDto,
     @RequestUser() user: UserTokenDto,
   ) {
-    return this.rmqClient.send(JOB_SERVICE_MESSAGE_PATTERNS.CREATE_JOB, {
-      userId: user._id,
-      uuid: v4(),
-      ...body,
-    });
+    this.rmqClient
+      .send(JOB_SERVICE_MESSAGE_PATTERNS.CREATE_JOB, {
+        userId: user._id,
+        uuid: v4(),
+        ...body,
+      })
+      .subscribe({
+        next: function () {
+          logger.debug('next');
+        },
+        error: function (err) {
+          logger.error(err);
+        },
+        complete: function () {
+          logger.debug('Job Inserted in queue');
+        },
+      });
+    return 'Job submitted successfully';
   }
 
   /**

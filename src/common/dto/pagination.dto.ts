@@ -3,7 +3,7 @@ import { IsNumberString, IsOptional, IsString } from 'class-validator';
 export class PaginationDto {
   @IsOptional()
   @IsNumberString()
-  pageNo = '0';
+  pageNo = '1';
 
   @IsOptional()
   @IsNumberString()

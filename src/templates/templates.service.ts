@@ -32,13 +32,13 @@ export class TemplatesService {
     const data = await this.templateRepository.find(
       filter,
       {},
-      { skip: +query.pageNo * +query.pageSize, limit: +query.pageSize },
+      { skip: (+query.pageNo - 1) * +query.pageSize, limit: +query.pageSize },
     );
 
     return {
       data,
       fetchCount: await this.templateRepository.countDocuments(filter),
-      totalCount: await this.templateRepository.countDocuments(),
+      totalCount: await this.templateRepository.countDocuments({ userId }),
     };
   }
 

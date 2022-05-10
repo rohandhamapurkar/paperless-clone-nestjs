@@ -39,12 +39,12 @@ export class DatasetsService {
     const data = await this.datasetRepository.find(
       filter,
       {},
-      { skip: +query.pageNo * +query.pageSize, limit: +query.pageSize },
+      { skip: (+query.pageNo - 1) * +query.pageSize, limit: +query.pageSize },
     );
     return {
       data,
       fetchCount: await this.datasetRepository.countDocuments(filter),
-      totalCount: await this.datasetRepository.countDocuments(),
+      totalCount: await this.datasetRepository.countDocuments({ userId }),
     };
   }
 
@@ -66,7 +66,7 @@ export class DatasetsService {
 
     return this.connection
       .collection(String(dataset._id))
-      .find({}, { limit: 20 })
+      .find({}, { projection: { _id: 0 }, limit: 20 })
       .toArray();
   }
 
@@ -88,6 +88,7 @@ export class DatasetsService {
         session = await this.connection.startSession();
         const jsonStream = this.commonService.xlsxToJson(file);
         const promiseArr: Promise<void>[] = [];
+        const headersArr: Set<string> = new Set();
 
         await session.startTransaction();
 
@@ -97,6 +98,7 @@ export class DatasetsService {
               name: datasetName,
               userId,
               createdOn: new Date(),
+              headers: [],
             },
           ],
           { session },
@@ -115,13 +117,18 @@ export class DatasetsService {
         // stream on each data row recieved try building the finalObj and insert into the tempCollection
         jsonStream.on('data', async (obj) => {
           return promiseArr.push(
-            this.buildDatasetRow({ obj, session, collectionName }),
+            this.buildDatasetRow({ obj, session, collectionName, headersArr }),
           );
         });
 
         jsonStream.on('end', async () => {
           try {
             await Promise.all(promiseArr);
+            await this.datasetRepository.updateOne(
+              { _id: result._id },
+              { $set: { headers: Array.from(headersArr) } },
+              { session },
+            );
           } catch (e) {
             reject(e);
             jsonStream.destroy();
@@ -180,14 +187,18 @@ export class DatasetsService {
     obj,
     session,
     collectionName,
+    headersArr,
   }: {
     obj: any;
     session: mongoose.ClientSession;
     collectionName: string;
+    headersArr: Set<string>;
   }) {
     const opts = { session };
     const dto = new ExcelRowDto();
     dto.obj = obj;
+    for (const key of Object.keys(obj)) headersArr.add(key);
+
     const errors = await validate(dto);
     if (errors.length != 0)
       throw new BadRequestException(`Invalid data row, ${JSON.stringify(obj)}`);
