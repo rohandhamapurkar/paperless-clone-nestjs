@@ -28,6 +28,7 @@ import { JobsController } from './jobs.controller';
           name: 'JOB_SERVICE_TCP',
           transport: Transport.TCP,
           options: {
+            host: configService.get<string>('JOB_SERVICE_TCP_HOST'),
             port: configService.get<number>('JOB_SERVICE_TCP_PORT'),
           },
         }),
