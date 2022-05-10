@@ -16,9 +16,14 @@ async function bootstrap() {
   );
   app.useGlobalInterceptors(new WrapResponseInterceptor());
   app.enableCors({
-    origin: ['http://localhost:8080', 'https://plc-api-server.herokuapp.com/'],
+    origin: [
+      'http://localhost:8080',
+      'http://localhost:3000',
+      'https://plc-api-server.herokuapp.com',
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
+
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
   app.listen(configService.get<string>('PORT'));
   appContext.close();
