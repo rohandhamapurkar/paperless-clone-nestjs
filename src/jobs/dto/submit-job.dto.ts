@@ -4,21 +4,26 @@ import { Type } from 'class-transformer';
 import { IsObjectId } from 'src/common/decorators/isobjectid.decorator';
 
 class FabricObjectPosition {
-  angle: number;
-  scaleX: number;
-  scaleY: number;
-  left: number;
-  top: number;
+  angle?: number;
+  scaleX?: number;
+  scaleY?: number;
+  left?: number;
+  top?: number;
 }
 
 class FabricObjectStyle {
-  color: string;
-  fontFamily: string;
-  fontSize: number;
-  fontStyle: '' | 'normal' | 'italic' | 'oblique';
-  fontWeight: string;
-  horizontalAlignment: string;
-  underline: boolean;
+  originX?: string | undefined;
+  originY?: string | undefined;
+  height?: number | undefined;
+  color?: string | undefined;
+  backgroundColor?: string | undefined;
+  fontFamily?: string | undefined;
+  fontWeight?: string | number | undefined;
+  fontSize?: number | undefined;
+  underline?: boolean | undefined;
+  strikeThrough?: boolean | undefined;
+  horizontalAlignment?: string | undefined;
+  fontStyle?: '' | 'normal' | 'italic' | 'oblique' | undefined;
 }
 
 class FabricImageAttribute {
