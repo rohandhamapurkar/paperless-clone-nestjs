@@ -66,8 +66,8 @@ jobs:
           # push it to ECR so that it can
           # be deployed to ECS.
           aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_REPOSITORY }}
-          docker buildx build -t ${{ env.ECR_REPOSITORY }}/${{ env.CONTAINER_NAME }}:latest .
-          docker push ${{ env.ECR_REPOSITORY }}/${{ env.CONTAINER_NAME }}:latest
+          docker buildx build -t ${{ env.ECR_REPOSITORY }}/${{ env.CONTAINER_NAME }}:latest -o type=registry .
+          # docker push ${{ env.ECR_REPOSITORY }}/${{ env.CONTAINER_NAME }}:latest
           echo "::set-output name=image::${{ env.ECR_REPOSITORY }}/${{ env.CONTAINER_NAME }}:latest"
 
       - name: Fill in the new image ID in the Amazon ECS task definition
