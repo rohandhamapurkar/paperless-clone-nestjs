@@ -34,9 +34,8 @@ jobs:
           repository: rohandhamapurkar/plc-webapp
           path: './plc-webapp'
 
-      - uses: actions/checkout@v1
       - name: Build UI
-        working-directory: './plc-webapp'
+        working-directory: plc-webapp
         run: |
           npm install
           npm run build
