@@ -25,6 +25,11 @@ jobs:
     if: contains(github.event.head_commit.message, '_deploy_')
 
     steps:
+      - name: Node version setup
+        uses: actions/setup-node@v3.1.1
+        with:
+          node-version: 14.x
+          
       - name: Checkout paperless-api-server
         uses: actions/checkout@v3
 
