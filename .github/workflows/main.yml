@@ -3,7 +3,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Deploy to Amazon ECS
+name: Deploy Paperless API
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
         uses: actions/setup-node@v3.1.1
         with:
           node-version: 14.x
-          
+
       - name: Checkout paperless-api-server
         uses: actions/checkout@v3
 
