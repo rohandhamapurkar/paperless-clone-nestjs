@@ -1,6 +1,7 @@
 # compiled output
 /dist
 /client
+/plc-webapp
 /node_modules
 
 # Logs
