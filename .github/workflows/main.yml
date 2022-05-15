@@ -11,7 +11,7 @@ on:
       - main
 
 env:
-  AWS_REGION: us-east-1 # preferred AWS region, e.g. us-west-1
+  AWS_REGION: us-east-2 # preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: public.ecr.aws/v6v6m1q7 # Amazon ECR repository name
   ECS_SERVICE: plc-api-service # Amazon ECS service name
   ECS_CLUSTER: plc-cluster # Amazon ECS cluster name
