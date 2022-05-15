@@ -35,12 +35,12 @@ jobs:
           path: './plc-webapp'
 
       - uses: actions/checkout@v1
-      - name: Build SSE UI
+      - name: Build UI
+        working-directory: ./plc-webapp
         run: |
-          cd ./plc-webapp
           npm install
           npm run build
-          cp ./dist ../client
+          cp dist ../client
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@13d241b293754004c80624b5567555c4a39ffbe3
