@@ -30,6 +30,12 @@ jobs:
         with:
           node-version: 14.x
 
+      - name: Set up QEMU dependency
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
       - name: Checkout paperless-api-server
         uses: actions/checkout@v3
 
@@ -60,7 +66,7 @@ jobs:
           # push it to ECR so that it can
           # be deployed to ECS.
           aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_REPOSITORY }}
-          docker build -t ${{ env.ECR_REPOSITORY }}/${{ env.CONTAINER_NAME }}:latest .
+          docker buildx build -t ${{ env.ECR_REPOSITORY }}/${{ env.CONTAINER_NAME }}:latest .
           docker push ${{ env.ECR_REPOSITORY }}/${{ env.CONTAINER_NAME }}:latest
           echo "::set-output name=image::${{ env.ECR_REPOSITORY }}/${{ env.CONTAINER_NAME }}:latest"
 
