@@ -39,6 +39,11 @@ jobs:
           repository: rohandhamapurkar/plc-webapp
           path: './plc-webapp'
 
+      - name: Build NestJS Backend
+        run: |
+          npm install --save-prod
+          npm run build
+
       - name: Build UI
         working-directory: plc-webapp
         run: |
