@@ -60,11 +60,12 @@ jobs:
           docker buildx build -t ${{ secrets.ECR_REPOSITORY }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest -o type=registry .
           # docker push ${{ secrets.ECR_REPOSITORY }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
           echo "::set-output name=image::${{ secrets.ECR_REPOSITORY }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest"
+
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ${{ secrets.ECS_TASK_DEFINITION }}
+          task-definition: .aws/task-definition.json
           container-name: ${{ secrets.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
