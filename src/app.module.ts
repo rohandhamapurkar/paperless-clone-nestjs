@@ -12,7 +12,7 @@ import { join } from 'path';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath: 'paperless-api.env' }),
+    ConfigModule.forRoot({ envFilePath: 'paperless-clone-api-service.env' }),
 
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'client'),
