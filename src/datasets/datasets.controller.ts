@@ -11,20 +11,17 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { Permissions } from 'src/auth/decorators/permissions.decorator';
 import { RequestUser } from 'src/auth/decorators/request-user.decorator';
 import { UserTokenDto } from 'src/auth/dto/user-token-payload.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { DatasetsService } from './datasets.service';
 import { DatasetParamsDto } from './dto/dataset-params.dto';
 import { UploadReqBodyDto } from './dto/upload-req.dto';
 import { DatasetFileInterceptor } from './interceptors/dataset-file.interceptor';
 
-@UseGuards(JwtAuthGuard, PermissionsGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('datasets')
-@Permissions('crud:datasets')
 export class DatasetsController {
   constructor(private readonly datasetService: DatasetsService) {}
 

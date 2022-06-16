@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
@@ -9,7 +9,6 @@ import { JobsModule } from './jobs/jobs.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 
 import { join } from 'path';
-import { HttpsRedirectMiddleware } from './common/middleware/redirect-middleware';
 
 @Module({
   imports: [
@@ -47,8 +46,4 @@ import { HttpsRedirectMiddleware } from './common/middleware/redirect-middleware
   controllers: [],
   providers: [],
 })
-export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(HttpsRedirectMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}

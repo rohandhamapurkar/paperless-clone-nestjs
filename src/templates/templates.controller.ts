@@ -21,13 +21,10 @@ import { TemplateImageFileInterceptor } from './interceptors/template-image-file
 import { TemplatesService } from './templates.service';
 import { TemplateParamsDto } from './dto/template-params.dto';
 import { UserTokenDto } from 'src/auth/dto/user-token-payload.dto';
-import { Permissions } from 'src/auth/decorators/permissions.decorator';
-import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
 import { PaginationDto } from '../common/dto/pagination.dto';
 
-@UseGuards(JwtAuthGuard, PermissionsGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('templates')
-@Permissions('crud:templates')
 export class TemplatesController {
   constructor(private readonly templateService: TemplatesService) {}
 

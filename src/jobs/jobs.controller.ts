@@ -11,12 +11,10 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { Permissions } from 'src/auth/decorators/permissions.decorator';
 import { RequestUser } from 'src/auth/decorators/request-user.decorator';
 import { UserTokenDto } from 'src/auth/dto/user-token-payload.dto';
 
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { v4 } from 'uuid';
 import { JOB_SERVICE_MESSAGE_PATTERNS } from './constants';
@@ -24,9 +22,8 @@ import { GetJobsChangelogDto } from './dto/get-job-changelog.dto';
 import { SubmitJobDto } from './dto/submit-job.dto';
 const logger = new Logger('JobsController');
 
-@UseGuards(JwtAuthGuard, PermissionsGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('jobs')
-@Permissions('crud:jobs')
 export class JobsController {
   constructor(
     // Tcp client instance for communication with job microservice
