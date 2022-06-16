@@ -10,7 +10,6 @@ import {
   Body,
   Logger,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
 import { RequestUser } from 'src/auth/decorators/request-user.decorator';
 import { UserTokenDto } from 'src/auth/dto/user-token-payload.dto';
 
@@ -20,18 +19,13 @@ import { v4 } from 'uuid';
 import { JOB_SERVICE_MESSAGE_PATTERNS } from './constants';
 import { GetJobsChangelogDto } from './dto/get-job-changelog.dto';
 import { SubmitJobDto } from './dto/submit-job.dto';
+import { JobsService } from './jobs.service';
 const logger = new Logger('JobsController');
 
 @UseGuards(JwtAuthGuard)
 @Controller('jobs')
 export class JobsController {
-  constructor(
-    // Tcp client instance for communication with job microservice
-    @Inject('JOB_SERVICE_TCP') private tcpClient: ClientProxy,
-    // RabbitMQ client instance for communication with job microservice
-    @Inject('JOB_SERVICE_RMQ') private rmqClient: ClientProxy,
-  ) {}
-
+  constructor(private readonly jobsService: JobsService) {}
   /**
    * Submits the job definition from UI to job microservice
    */
@@ -40,24 +34,24 @@ export class JobsController {
     @Body() body: SubmitJobDto,
     @RequestUser() user: UserTokenDto,
   ) {
-    this.rmqClient
-      .send(JOB_SERVICE_MESSAGE_PATTERNS.CREATE_JOB, {
-        userId: user._id,
-        uuid: v4(),
-        ...body,
-      })
-      .subscribe({
-        next: function () {
-          logger.debug('next');
-        },
-        error: function (err) {
-          logger.error(err);
-        },
-        complete: function () {
-          logger.debug('Job Inserted in queue');
-        },
-      });
-    return 'Job submitted successfully';
+    // this.rmqClient
+    //   .send(JOB_SERVICE_MESSAGE_PATTERNS.CREATE_JOB, {
+    //     userId: user._id,
+    //     uuid: v4(),
+    //     ...body,
+    //   })
+    //   .subscribe({
+    //     next: function () {
+    //       logger.debug('next');
+    //     },
+    //     error: function (err) {
+    //       logger.error(err);
+    //     },
+    //     complete: function () {
+    //       logger.debug('Job Inserted in queue');
+    //     },
+    //   });
+    // return 'Job submitted successfully';
   }
 
   /**
@@ -65,7 +59,7 @@ export class JobsController {
    */
   @Get()
   getJobs(@Query() query: PaginationDto, @RequestUser() user: UserTokenDto) {
-    return this.tcpClient.send(JOB_SERVICE_MESSAGE_PATTERNS.GET_JOBS, {
+    return this.jobsService.findAll({
       ...query,
       userId: user._id,
     });
@@ -79,8 +73,8 @@ export class JobsController {
     @Param() param: GetJobsChangelogDto,
     @RequestUser() user: UserTokenDto,
   ) {
-    return this.tcpClient.send(JOB_SERVICE_MESSAGE_PATTERNS.GET_JOB_CHANGELOG, {
-      jobId: param.id,
+    return this.jobsService.getChangelog({
+      id: param.id,
       userId: user._id,
     });
   }

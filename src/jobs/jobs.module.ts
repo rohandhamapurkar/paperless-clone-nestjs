@@ -1,41 +1,26 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { MongooseModule } from '@nestjs/mongoose';
 import { JobsController } from './jobs.controller';
+import { Job, JobSchema } from './entities/job.entity';
+import {
+  JobChangelog,
+  JobChangelogSchema,
+} from './entities/job-changelog.entity';
+import { JobsService } from './jobs.service';
 
 @Module({
   imports: [
-    ClientsModule.registerAsync([
-      {
-        name: 'JOB_SERVICE_RMQ',
-        imports: [ConfigModule],
-        useFactory: async (configService: ConfigService) => ({
-          transport: Transport.RMQ,
-          options: {
-            urls: [configService.get<string>('AMQP_CONN_URI')],
-            queue: configService.get<string>('AMQP_QUEUE_NAME'),
-            queueOptions: {
-              durable: false,
-            },
-          },
-        }),
-        inject: [ConfigService],
-      },
-      {
-        name: 'JOB_SERVICE_TCP',
-        imports: [ConfigModule],
-        useFactory: async (configService: ConfigService) => ({
-          name: 'JOB_SERVICE_TCP',
-          transport: Transport.TCP,
-          options: {
-            host: configService.get<string>('JOB_SERVICE_TCP_HOST'),
-            port: configService.get<number>('JOB_SERVICE_TCP_PORT'),
-          },
-        }),
-        inject: [ConfigService],
-      },
-    ]),
+    MongooseModule.forFeature(
+      [
+        { name: Job.name, schema: JobSchema },
+        { name: JobChangelog.name, schema: JobChangelogSchema },
+      ],
+      'paperless-db',
+    ),
   ],
   controllers: [JobsController],
+  providers: [JobsService],
 })
 export class JobsModule {}
