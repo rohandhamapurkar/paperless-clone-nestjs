@@ -1,11 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { GetJobsChangelogDto } from './dto/get-job-changelog.dto';
 import { GetJobsDto } from './dto/get-jobs.dto';
 import { JobChangelog } from './entities/job-changelog.entity';
 import { Job } from './entities/job.entity';
-const logger = new Logger('JobsService');
 
 @Injectable()
 export class JobsService {
@@ -14,11 +13,6 @@ export class JobsService {
     private readonly jobRepository: mongoose.Model<Job>,
     @InjectModel(JobChangelog.name)
     private readonly jobChangelogRepository: mongoose.Model<JobChangelog>,
-
-    @InjectConnection('paperless-db')
-    private readonly paperlessDbConnection: mongoose.Connection,
-    @InjectConnection('datasets-db')
-    private readonly datasetsDbConnection: mongoose.Connection,
   ) {}
 
   /**
