@@ -17,7 +17,7 @@ Access the demo at <a href="https://paperless-clone.herokuapp.com/#/" target="_b
 
 The below is the system srchitecture when deployed on Heroku.
 
-<img src="paperless_clone.svg"/>
+<img src="sys-diagram.png"/>
 
 ## Installation
 
