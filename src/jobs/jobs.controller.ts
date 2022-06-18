@@ -8,8 +8,12 @@ import {
   Param,
   Body,
   Logger,
+  UseInterceptors,
+  BadRequestException,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { validate } from 'class-validator';
 import { RequestUser } from 'src/auth/decorators/request-user.decorator';
 import { UserTokenDto } from 'src/auth/dto/user-token-payload.dto';
 
@@ -31,14 +35,24 @@ export class JobsController {
    * Submits the job definition from UI to job microservice
    */
   @Post()
-  submitJobToQueue(
-    @Body() body: SubmitJobDto,
+  @UseInterceptors(FileInterceptor('file'))
+  async submitJobToQueue(
+    @Body() body: { payload: string },
     @RequestUser() user: UserTokenDto,
   ) {
+    const parsedPayload = JSON.parse(body.payload);
+    const dto = new SubmitJobDto();
+    dto.dataConfig = parsedPayload.dataConfig;
+    dto.templateId = parsedPayload.templateId;
+    const errors = await validate(dto);
+    if (errors.length != 0)
+      throw new BadRequestException('Invalid job definition');
+    const job = await this.jobsService.assertJob({
+      parsedEventBody: { ...parsedPayload, userId: user._id },
+    });
     this.awsSqsClient
       .emit(JOB_SERVICE_MESSAGE_PATTERNS.CREATE_JOB, {
-        userId: user._id,
-        ...body,
+        jobId: job._id,
       })
       .subscribe({
         next: function () {
