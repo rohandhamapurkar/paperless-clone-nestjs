@@ -10,6 +10,9 @@ const logger = new Logger('TemplatesTestSuite');
 describe('TemplatesController', () => {
   let controller: TemplatesController;
 
+  const templateId = '61632f59405d4e410947991f';
+  const userId = '61632f59405d4e410947991d';
+
   const mockFile = {
     fieldname: 'string',
     originalname: 'string',
@@ -24,7 +27,7 @@ describe('TemplatesController', () => {
   };
   const mockUser = {
     iss: 'string',
-    _id: 'string',
+    _id: userId,
     sub: 'string',
     aud: ['string'],
     iat: 100,
@@ -34,9 +37,10 @@ describe('TemplatesController', () => {
   };
 
   const mockTemplate = {
-    userId: 'userId',
+    _id: templateId,
+    userId: userId,
     name: 'name',
-    imageUrl: 'imageUrl',
+    imageUrl: 'https://imgur-image-url/',
     createdOn: new Date(),
     updatedOn: new Date(),
   };
@@ -102,7 +106,7 @@ describe('TemplatesController', () => {
       await controller.updateTemplate(
         mockFile,
         { name: 'updatedName' },
-        { id: 'templateId' },
+        { id: templateId },
         mockUser,
       ),
     ).toEqual('Updated template successfully');
@@ -110,7 +114,7 @@ describe('TemplatesController', () => {
 
   it('delete a template', async () => {
     expect(
-      await controller.deleteTemplate({ id: 'templateId' }, mockUser),
+      await controller.deleteTemplate({ id: templateId }, mockUser),
     ).toEqual('Deleted template successfully');
   });
 });
