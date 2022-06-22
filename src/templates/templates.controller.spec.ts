@@ -1,67 +1,12 @@
-import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Stream } from 'stream';
-import { Template } from './entities/template.entity';
+import { templateImageFileStub, templateStub } from 'test/stubs/template.stub';
+import { userStub } from 'test/stubs/user.stub';
 import { TemplatesController } from './templates.controller';
 import { TemplatesService } from './templates.service';
-
-const logger = new Logger('TemplatesTestSuite');
+import { mockTemplateService } from './__mocks__/templates.service.mock';
 
 describe('TemplatesController', () => {
   let controller: TemplatesController;
-
-  const templateId = '61632f59405d4e410947991f';
-  const userId = '61632f59405d4e410947991d';
-
-  const mockFile = {
-    fieldname: 'string',
-    originalname: 'string',
-    encoding: 'string',
-    mimetype: 'string',
-    size: 5000,
-    stream: new Stream.Readable(),
-    destination: 'string',
-    filename: 'string',
-    path: 'string',
-    buffer: Buffer.from('test', 'utf8'),
-  };
-  const mockUser = {
-    iss: 'string',
-    _id: userId,
-    sub: 'string',
-    aud: ['string'],
-    iat: 100,
-    exp: 100,
-    azp: 'string',
-    scope: 'string',
-  };
-
-  const mockTemplate = {
-    _id: templateId,
-    userId: userId,
-    name: 'name',
-    imageUrl: 'https://imgur-image-url/',
-    createdOn: new Date(),
-    updatedOn: new Date(),
-  };
-
-  const mockTemplatesService = {
-    create: () => {
-      logger.debug('mocking creation');
-    },
-    update: () => {
-      logger.debug('mocking update');
-    },
-    remove: () => {
-      logger.debug('mocking delete');
-    },
-    findAll: (): Template[] => {
-      return [mockTemplate];
-    },
-    findOne: (): Template => {
-      return mockTemplate;
-    },
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -69,7 +14,7 @@ describe('TemplatesController', () => {
       providers: [
         {
           provide: TemplatesService,
-          useValue: mockTemplatesService,
+          useValue: mockTemplateService,
         },
       ],
     }).compile();
@@ -84,37 +29,37 @@ describe('TemplatesController', () => {
   it('should create a template', async () => {
     expect(
       await controller.createTemplate(
-        mockFile,
+        templateImageFileStub,
         { name: 'test.xlsx' },
-        mockUser,
+        userStub,
       ),
     ).toEqual('Template created successfully');
   });
 
   it('should get templates', async () => {
     expect(
-      await controller.getTemplates(mockUser, {
+      await controller.getTemplates(userStub, {
         pageNo: '1',
         pageSize: '10',
         searchText: '',
       }),
-    ).toEqual([mockTemplate]);
+    ).toEqual([templateStub]);
   });
 
   it('should update template', async () => {
     expect(
       await controller.updateTemplate(
-        mockFile,
+        templateImageFileStub,
         { name: 'updatedName' },
-        { id: templateId },
-        mockUser,
+        { id: templateStub._id },
+        userStub,
       ),
     ).toEqual('Updated template successfully');
   });
 
   it('delete a template', async () => {
     expect(
-      await controller.deleteTemplate({ id: templateId }, mockUser),
+      await controller.deleteTemplate({ id: templateStub._id }, userStub),
     ).toEqual('Deleted template successfully');
   });
 });
