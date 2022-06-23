@@ -23,7 +23,7 @@ export const templateStub: {
 export const templateImageFileStub = {
   fieldname: 'string',
   originalname: 'string',
-  encoding: 'string',
+  encoding: 'image/jpg',
   mimetype: 'string',
   size: 5000,
   stream: new Stream.Readable(),

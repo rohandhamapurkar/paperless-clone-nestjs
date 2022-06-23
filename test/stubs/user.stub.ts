@@ -10,3 +10,9 @@ export const userStub: UserTokenDto = {
   azp: 'string',
   scope: 'string',
 };
+
+export const paginationStub = {
+  pageNo: '1',
+  pageSize: '10',
+  searchText: '',
+};

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { templateImageFileStub, templateStub } from 'test/stubs/template.stub';
-import { userStub } from 'test/stubs/user.stub';
+import { paginationStub, userStub } from 'test/stubs/user.stub';
 import { TemplatesController } from './templates.controller';
 import { TemplatesService } from './templates.service';
 import { mockTemplateService } from './__mocks__/templates.service.mock';
@@ -37,13 +37,9 @@ describe('TemplatesController', () => {
   });
 
   it('should get templates', async () => {
-    expect(
-      await controller.getTemplates(userStub, {
-        pageNo: '1',
-        pageSize: '10',
-        searchText: '',
-      }),
-    ).toEqual([templateStub]);
+    expect(await controller.getTemplates(userStub, paginationStub)).toEqual([
+      templateStub,
+    ]);
   });
 
   it('should update template', async () => {
